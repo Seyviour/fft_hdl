@@ -1,5 +1,5 @@
 module AGU #(
-    parameter N = 1024
+    parameter N = 8
 ) (
     input wire clk,
     input wire [$clog2(N)-1: 0] stage,
@@ -9,15 +9,11 @@ module AGU #(
 
 
 
-// j - stage size: clog2(N)
-// i - pair id : clog2(N/2)
-// address : clog2(N)
-
 localparam log2N = $clog2(N);
-//localparam log2N2 = $clog2(N/2); 
+ 
 
-reg [$clog2(N)-1: 0] stage_reg;
-reg [$clog2(N/2) - 1: 0] pair_id_reg;
+reg [log2N-1: 0] stage_reg;
+reg [(log2N -1)- 1: 0] pair_id_reg;
 reg [log2N -1: 0] i_address1, i_address2;  
 
 
@@ -36,7 +32,6 @@ always @(posedge clk) begin
     stage_reg <= stage;
     address1 <= i_address1;
     address2 <= i_address2; 
-    
 end
 
 
