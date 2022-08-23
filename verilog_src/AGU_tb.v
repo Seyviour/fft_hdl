@@ -37,10 +37,11 @@ end
 
 always @(posedge clk) begin
     pair_id <= pair_id + 1;
-    if (&pair_id)
-        stage_id = stage_id + 1; 
-    if (&stage_id & &pair_id)
-        $stop; 
+    if (pair_id == 15)begin
+      if ((stage_id == 4))
+        $finish;
+      else stage_id <= stage_id + 1; 
+    end
 end
 
 always
