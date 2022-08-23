@@ -27,17 +27,21 @@ reg [log2N -1: 0] i_address1, i_address2;
 
 reg  [log2N-1 : 0] pair_id_x_2, pair_id_x_2_1; // (pair_id*2, pair_id*2+1)
 reg [log2N-1: 0] twiddle_address_reg;
-reg [log2N: 0] mask; 
+reg [log2N: 0] mask;
+reg [log2N: 0] mask_;
+reg [log2N-1: 0] shift_by;  
+
 
 // integer i; 
 
-always @(*)begin
+always @(pair_id, stage)begin
     pair_id_x_2 = {1'b0, pair_id} + {1'b0, pair_id}; 
     pair_id_x_2_1 = pair_id_x_2 + 1;
     i_address1 = barrel_shift_left(pair_id_x_2, stage);
     i_address2 = barrel_shift_left(pair_id_x_2_1, stage);
     mask = (1 << stage);
-    twiddle_address_reg = (mask-1) & pair_id; 
+    mask_ = mask - 1;
+    twiddle_address_reg = mask_[log2N-1:0] & pair_id; 
     
     //generate 
     // for (i = 0; i<log2N-1; i = i + 1) begin
@@ -68,7 +72,7 @@ function [log2N-1:0] barrel_shift_left;
     reg [2*log2N-1:0] doublej;
     reg  [log2N-1:0] temp;
     begin
-        max_index = {log2N{1'b1}};
+        max_index = log2N;
         doublej = {j, j};
         temp = max_index - i; 
         barrel_shift_left = doublej[temp+:log2N];   
