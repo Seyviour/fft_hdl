@@ -26,22 +26,27 @@ reg [log2N -1: 0] i_address1, i_address2;
 // Twiddle address is computed by masking the LS log2N-stage-1 bits of pair_id
 
 reg  [log2N-1 : 0] pair_id_x_2, pair_id_x_2_1; // (pair_id*2, pair_id*2+1)
-reg [log2N-2: 0] twiddle_address_reg;
+reg [log2N-1: 0] twiddle_address_reg;
+reg [log2N: 0] mask; 
 
-integer i; 
+// integer i; 
 
 always @(*)begin
     pair_id_x_2 = {1'b0, pair_id} + {1'b0, pair_id}; 
     pair_id_x_2_1 = pair_id_x_2 + 1;
     i_address1 = barrel_shift_left(pair_id_x_2, stage);
     i_address2 = barrel_shift_left(pair_id_x_2_1, stage);
+    mask = (1 << stage);
+    twiddle_address_reg = (mask-1) & pair_id; 
     
-    for (i = 0; i<log2N-1; i = i + 1) begin
-        if (i < log2N-stage-1) 
-            twiddle_address_reg[i] = pair_id[i]; 
-        else
-            twiddle_address_reg[i] = 1'b0; 
-    end
+    //generate 
+    // for (i = 0; i<log2N-1; i = i + 1) begin
+    //     if (i < log2N-stage-1) 
+    //         twiddle_address_reg[i] = pair_id[i]; 
+    //     else
+    //         twiddle_address_reg[i] = 1'b0; 
+    // end
+    //endgenerate
 
 end
 
