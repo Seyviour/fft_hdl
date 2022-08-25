@@ -1,11 +1,14 @@
 module AGU #(
-    parameter N = 1024
+    parameter N = 32,
+    stage_width = $clog2($clog2(N)),
+    pair_id_width = $clog2(N/2),
+    address_width = $clog2(N)
 ) (
-    input wire clk,
-    input wire [$clog2(N)-1: 0] stage,
-    input wire [$clog2(N/2) - 1: 0] pair_id, 
-    output reg [$clog2(N) -1 : 0] address1, address2, 
-    output reg [$clog2(N) -1: 0] twiddle_address
+    input wire clk, reset,
+    input wire [stage_width-1: 0] stage,
+    input wire [pair_id_width - 1: 0] pair_id, 
+    output reg [address_width -1 : 0] address1, address2, 
+    output reg [address_width -1: 0] twiddle_address
 );
 
 
@@ -18,30 +21,29 @@ localparam log2N = $clog2(N);
 // signal declaration
 //reg [log2N-1: 0] stage_reg;
 //reg [(log2N -1)- 1: 0] pair_id_reg;
-reg [log2N -1: 0] i_address1, i_address2;  
+reg [address_width -1: 0] i_address1, i_address2;  
 
 // addresses for the samples in the pair are computed as
 // ROT_N_(2*pair_id, stage), ROT_N_(2*pair_id+1, stage)
 
 // Twiddle address is computed by masking the LS log2N-stage-1 bits of pair_id
 
-reg  [log2N-1 : 0] pair_id_x_2, pair_id_x_2_1; // (pair_id*2, pair_id*2+1)
-reg [log2N-1: 0] twiddle_address_reg;
-reg [log2N: 0] mask;
-reg [log2N: 0] mask_;
-reg [log2N-1: 0] shift_by;  
-
-
+reg [pair_id_width : 0] pair_id_x_2, pair_id_x_2_1; // (pair_id*2, pair_id*2+1)
+reg [address_width-1: 0] i_twiddle_address;
+reg [address_width: 0] mask;
+reg [address_width: 0] mask_;
 // integer i; 
 
-always @(pair_id, stage)begin
-    pair_id_x_2 = {1'b0, pair_id} + {1'b0, pair_id}; 
-    pair_id_x_2_1 = pair_id_x_2 + 1;
+always @(*)begin
+    pair_id_x_2 = {pair_id, 1'b0}; 
+
+    //OR can be used to add 1 since the last bit of pair_id_x_2 is necessarily 0
+    pair_id_x_2_1 = {pair_id, 1'b1};
     i_address1 = barrel_shift_left(pair_id_x_2, stage);
     i_address2 = barrel_shift_left(pair_id_x_2_1, stage);
-    mask = (1 << stage);
-    mask_ = mask - 1;
-    twiddle_address_reg = mask_[log2N-1:0] & pair_id; 
+    mask = (1'b1 << stage);
+    mask_ = mask - 1'b1;
+    i_twiddle_address = mask_[log2N-1:0] & pair_id; 
     
     //generate 
     // for (i = 0; i<log2N-1; i = i + 1) begin
@@ -54,25 +56,33 @@ always @(pair_id, stage)begin
 
 end
 
-always @(posedge clk) begin
+always @(posedge clk, posedge reset) begin
     // pair_id_reg <= pair_id; 
     // stage_reg <= stage;
-    address1 <= i_address1;
-    address2 <= i_address2;
-    twiddle_address <= twiddle_address_reg;
+
+    if (reset) begin
+        address1 <= 0; 
+        address2 <= 0; 
+        twiddle_address <= 0; 
+    end else begin
+        address1 <= i_address1;
+        address2 <= i_address2;
+        twiddle_address <= i_twiddle_address;
+    end
 end
 
 
 // barrel shift vector j by vector i
 function [log2N-1:0] barrel_shift_left;
-    input [log2N-1:0] j; //vector to be barrel shifted
-    input [log2N-1:0] i; // amount to shift by
+    input [pair_id_width: 0] j; //vector to be barrel shifted
+    input [stage_width-1: 0] i; // amount to shift by
 
-    reg [log2N-1: 0] max_index;
-    reg [2*log2N-1:0] doublej;
-    reg  [log2N-1:0] temp;
+    reg [stage_width-1: 0] max_index, temp;
+    reg [2*pair_id_width+1: 0] doublej;
+
+    //reg  [log2N-1:0] temp;
     begin
-        max_index = log2N;
+        max_index = log2N & {stage_width{1'b1}};
         doublej = {j, j};
         temp = max_index - i; 
         barrel_shift_left = doublej[temp+:log2N];   
