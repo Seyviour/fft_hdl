@@ -37,15 +37,17 @@ class DataMonitor:
         self._coro.kill()
         self._coro = None
     
-    async def _run(self) -> None: 
+    async def run(self) -> None: 
         await cocotb.triggers.ClockCycles(self._clk, self._delay, rising=True)
         while True:
             await RisingEdge(self._clk)
             self.values.put_nowait(self._sample())
+            # print(self.value)
 
     def _sample(self) -> Dict[str, Any]:
 
-        return {name: handle.value for name, handle in self._data.items()}
+        a =  {name: handle.value for name, handle in self._data.items()}
+        return a
 
 
 """
@@ -73,8 +75,9 @@ class fftInputTester:
         self.previous_state = None
         # Yeah, yeah, I know it's actually a dict
         self._input_list = {
-            "samp1": self.dut.sample1,
-            "samp2": self.dut.sample2,
+            "reset": self.dut.reset,
+            "sample1": self.dut.sample1,
+            "sample2": self.dut.sample2,
             "en": self.dut.en,
             "in_valid": self.dut.in_valid
         }
@@ -86,6 +89,8 @@ class fftInputTester:
             "wr_en": self.dut.wr_en,
             "done": self.dut.done
         }
+
+        self._checker = None
 
         self.input_mon = DataMonitor(
             clk = self.dut.clk,
@@ -104,12 +109,11 @@ class fftInputTester:
 
 
     async def _check(self):
-        print("I ran")
         self.previous_state = None
         while True: 
             await RisingEdge(self.dut.clk)
-            data_out = self.output_mon.values.get()
-            data_in = self.input_mon.values.get()
+            data_out = await self.output_mon.values.get()
+            data_in = await self.input_mon.values.get()
             self._check_reset(data_in, data_out)
             self._check_en(data_in, data_out)
             self.previous_state = data_out
@@ -117,7 +121,6 @@ class fftInputTester:
             
 
     def _check_reset(self, data_in, data_out):
-        
         if (data_in["reset"].value == 1):
             assert data_out["done"].value == 0, "Failure: 'done' signal not 0 on reset"
             assert data_out["wr_en"].value == 0, "Failure: 'wr_en' 1 on reset (attempt to write invalid data)"
@@ -146,10 +149,15 @@ class fftInputTester:
                     assert data_out["wr_en"].value == 0
                 
                 else:
-                    assert data_out["addr1"].value == (self.previous_state["addr1"].value + 2)
-                    assert data_out["addr2"].value == (self.previous_state["addr2"].value + 2)
-                    assert data_out["comp1"].value == data_in["sample1"].value + data_in["sample2"].value
-                    assert data_out["comp2"].value == data_in["sample1"].value - data_in["sample2"].value
+                    if data_out["done"].value != 1: 
+                        assert data_out["addr1"].value == (self.previous_state["addr1"].value + 2)
+                        assert data_out["addr2"].value == (self.previous_state["addr2"].value + 2)
+                    
+                        comp1 = data_in["sample1"].value + data_in["sample2"].value
+                        comp2 = data_in["sample1"].value - data_in["sample2"].value
+                    
+                        assert data_out["comp1"].signed_integer == comp1
+                        assert data_out["comp2"].signed_integer == comp2
     
     def start(self): 
         """Start monitors, model and checker corouting"""
@@ -186,7 +194,12 @@ async def test_fft_input(dut):
     await FallingEdge(dut.clk)
     dut.reset.value = 0
 
-    
+    dut.sample1.value = 0
+    dut.sample2.value = 0
+    dut.en.value = 0
+    dut.in_valid.value = 0 
+
+    tester.start()
 
     for x in range(0, 35, 2):
         await FallingEdge(dut.clk)
@@ -194,6 +207,8 @@ async def test_fft_input(dut):
         dut.in_valid.value = 1
         dut.sample1.value = x
         dut.sample2.value = x + 1
+    
+    
 
     
     await RisingEdge(dut.clk)
@@ -202,7 +217,7 @@ async def test_fft_input(dut):
 
 
 
-    
+
 
 
 
@@ -231,6 +246,6 @@ async def test_fft_input(dut):
 #   dut.addr2 = 0
 #   dut.wr_en = 0
 #   dut.done = 0
-
+ #First Cocotb testbench   
 
 
