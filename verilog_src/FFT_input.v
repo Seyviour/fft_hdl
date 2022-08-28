@@ -8,7 +8,7 @@ module fftInput #(
     input wire [word_size*2-1: 0] sample1, sample2, 
     output reg [word_size*2-1: 0] comp1, comp2,
     output reg [address_width-1: 0] addr1, addr2,
-    output reg wr_en, done
+    output reg wr_en, busy
 );
     
 initial begin
@@ -25,21 +25,23 @@ always @(posedge clk, posedge reset) begin
         addr1 <= 0;
         // addr2 <= 1;
         wr_en <= 0; 
-        done <= 0; 
+        busy <= 0; 
     end
 
-    else if (addr2 == N-1) begin
-        done <= 1;
-        wr_en <= 0;
-    end else begin     
-        comp1 <= {Cr, Ci}; 
-        comp2 <= {Dr, Di}; 
-        addr1 <= addr1 + 2;
-        // addr2 <= addr2 + 2;
-        wr_en <= in_valid & en;
+    else if (en) begin
+        if (addr2 == N-1) begin
+            busy <= 0;
+            wr_en <= 0;
+        end else begin
+            busy  <= 1'b1;  
+            comp1 <= {Cr, Ci}; 
+            comp2 <= {Dr, Di}; 
+            addr1 <= addr1 + 2;
+            // addr2 <= addr2 + 2;
+            wr_en <= in_valid & en;
         end
     end        
-
+end 
 reg [word_size-1: 0] Cr, Ci, Dr, Di;
 
 always @(*) begin
