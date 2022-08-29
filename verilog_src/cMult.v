@@ -4,14 +4,21 @@
 // 2. Do additions to generate output
 // 3. Do shifting necessary to maintain the Q.N fixed point format
 module cMult #(
-    parameter N = 16
+    parameter N = 32,
+    word_size = 16
 ) (
     input wire reset,
     input wire clk,
-    input wire [N-1:0] Ar, Ai, 
-    input wire [N-1:0] Br, Bi,
-    output reg [N-1:0] Cr, Ci
+    input wire [word_size*2-1:0] A, 
+    input wire [word_size*2-1:0] B,
+    output reg [word_size*2-1:0] C
 );
+
+wire [word_size-1: 0] Ar = A[word_size*2-1: word_size];
+wire [word_size-1: 0] Ai = A[word_size-1: 0];
+wire [word_size-1: 0] Br = B[word_size*2-1: word_size];
+wire [word_size-1: 0] Bi = B[word_size-1: 0];
+wire [word_size-1: 0] Cr, Ci;
 
 // signal declaration
 reg [2*N-1: 0] RR; // product of the two real components -> Ar * Br
@@ -25,7 +32,7 @@ reg [2*N-1: 0] I_sum; // sum of complex components -> RI + IR
 
 // multipy block
 // 1 cycle delay
-always @(posedge clk, negedge reset) begin
+always @(posedge clk, posedge reset) begin
 
     if (reset) begin
         RR <= 0;
@@ -43,7 +50,7 @@ end
 
 // add block
 // 1 cycle delay
-always @(posedge clk, negedge reset) begin
+always @(posedge clk, posedge reset) begin
 
     if(reset) begin
         R_sum <= 0;
@@ -58,10 +65,7 @@ end
 // shift block
 // 1 cycle delay
 always @* begin
-
-    Cr <= R_sum[2*N-1: N];
-    Ci <= I_sum[2*N-1: N]; 
-
+    C = {R_sum[2*word_size-1: word_size], I_sum[2*word_size-1: word_size]}; 
 end
 
     
