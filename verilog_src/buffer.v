@@ -1,38 +1,39 @@
 module buffer #(
-    parameter vector_size = 16,
-    buffer_length = 1
+    parameter word_size = 16,
+    buffer_length = 2
 ) (
     input wire clk, en, in_valid, reset,   
-    input wire [vector_size-1: 0] d_in,
-    output reg [vector_size-1: 0] d_out,
-    output reg d_valid
+    input wire [word_size-1: 0] d_in,
+    output wire [word_size-1: 0] d_out,
+    output wire d_valid
 );
 
 
 //SIGNAL DECLARATION
-reg [vector_size: 0] ibuffer [buffer_length-1: 0];
+reg [word_size: 0] ibuffer [buffer_length-1: 0];
 integer i;
 
 always @(posedge clk, posedge reset) begin
 
     if (reset) begin
-        for (i = 0; i <= buffer_length-2; i = i + 1) begin
+        for (i = 0; i <= buffer_length-1; i = i + 1) begin
             ibuffer[i] <= 0;
         end
+       
     end
-    else if (en) begin
+    else  begin
+        // if(en)
         ibuffer[buffer_length-1] <= {in_valid, d_in};
 
         //generate
         for (i = 0; i <= buffer_length-2; i = i + 1) begin
+            // if (en)
             ibuffer[i] <= ibuffer[i + 1];
         end
         //endgenerate
-        
-        d_out <= ibuffer[0][vector_size-1: 0];
-        d_valid <= ibuffer[0][vector_size];
-    
     end
 end
+assign d_out = ibuffer[0][word_size-1: 0];
+assign d_valid = ibuffer[0][word_size];
     
 endmodule
