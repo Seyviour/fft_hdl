@@ -4,11 +4,13 @@ module AGU #(
     pair_id_width = $clog2(N/2),
     address_width = $clog2(N)
 ) (
+    input wire i_valid, 
     input wire clk, reset,
     input wire [stage_width-1: 0] stage,
     input wire [pair_id_width - 1: 0] pair_id, 
     output reg [address_width -1 : 0] address1, address2, 
-    output reg [address_width -1: 0] twiddle_address
+    output reg [address_width -1: 0] twiddle_address,
+    output reg o_valid
 );
 
 
@@ -63,8 +65,10 @@ always @(posedge clk, posedge reset) begin
     if (reset) begin
         address1 <= 0; 
         address2 <= 0; 
-        twiddle_address <= 0; 
+        twiddle_address <= 0;
+        o_valid <= 0; 
     end else begin
+        o_valid <= i_valid; 
         address1 <= i_address1;
         address2 <= i_address2;
         twiddle_address <= i_twiddle_address;
