@@ -16,7 +16,7 @@ module twiddleROM #(
 reg [word_size-1:0] twiddle_real_ROM [N-1:0];
 reg [word_size-1:0] twiddle_im_ROM [N-1:0];
 
-reg [$clog2(N)-1: 0] reg_read_address; 
+//reg [$clog2(N)-1: 0] reg_read_address; 
 
 initial begin
     $readmemh(memory_file_im, twiddle_im_ROM);
@@ -25,9 +25,9 @@ end
 
 
 always @(posedge clk) begin
-    reg_read_address <= read_address; 
-    twiddle_real <= twiddle_real_ROM[reg_read_address];
-    twiddle_im  <= twiddle_im_ROM[reg_read_address]; 
+    //reg_read_address <= read_address; 
+    twiddle_real <= twiddle_real_ROM[read_address];
+    twiddle_im  <= twiddle_im_ROM[read_address]; 
 end
 
 endmodule
