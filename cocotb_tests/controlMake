@@ -1,0 +1,8 @@
+SIM ?= icarus
+TOPLEVEL_LANG = verilog
+VERILOG_SOURCES = /home/saviour/study/fft_hdl/verilog_src/ComputeDriver.v
+TOPLEVEL = fftDriver
+MODULE = tb_fft_control
+COCOTB_LOG_LEVEL = TRACE
+
+include $(shell cocotb-config --makefiles)/Makefile.sim
