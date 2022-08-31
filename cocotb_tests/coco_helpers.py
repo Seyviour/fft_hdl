@@ -6,46 +6,41 @@ from cocotb.triggers import FallingEdge, RisingEdge, Timer
 from cocotb.binary import BinaryValue
 from cocotb.handle import SimHandleBase
 from cocotb.queue import Queue
+from cocotb.types import Range, LogicArray
 
 from typing import Dict, Any, List
 
 class ComplexNumUtil:
     def __init__(self, n_real_bits, n_im_bits):
-        self.n_real = n_real_bits
-        self.n_im = n_im_bits
-        self.real_range = (-2**(n_real_bits-1), 2**(n_real_bits-1)-1)
-        self.im_range = (-2**(n_im_bits-1), 2**(n_im_bits-1)-1)
+        self.n_real_bits = n_real_bits
+        self.n_im_bits = n_im_bits
+        self.real_range = Range(n_real_bits-1, 0)
+        self.im_range = Range(n_im_bits-1, 0)
+        self.real_range_int = (-2**(n_real_bits-1), 2**(n_real_bits-1)-1)
+        self.im_range_int = (-2**(n_im_bits-1), 2**(n_im_bits-1)-1)
 
     def __repr__(self):
-        return f"ComplexNumGen(n_real_bits={self.n_real}, n_im_bits={self.n_im})"
+        return f"ComplexNumGen(real_range={self.real_range}, n_im_bits={self.im_range})"
 
     def create_random(self):
-        r = randint(*self.real_range)
-        im = randint(*self.im_range)
+        r = randint(*self.real_range_int)
+        im = randint(*self.im_range_int)
         return self.create_from(r, im)
 
     def create_from(self, r, im):
-        r =  BinaryValue(r, 
-                        n_bits=self.n_real,
-                        bigEndian=False,
-                        binaryRepresentation=BinaryRepresentation.TWOS_COMPLEMENT
-                        )
+        r =  LogicArray(r, self.real_range)
+        im = LogicArray(im, self.im_range)
 
-        im = BinaryValue(im,
-                        n_bits=self.n_im,
-                        bigEndian=False,
-                        binaryRepresentation=BinaryRepresentation.TWOS_COMPLEMENT)
-        
-        
-        return BinaryValue((r.binstr + im.binstr), bigEndian=False, binaryRepresentation=BinaryRepresentation.TWOS_COMPLEMENT)
+        this_range = Range(self.n_im_bits+self.n_real_bits-1, 0)
+        return LogicArray(r.binstr + im.binstr, this_range)
 
     
-    def decode(self, val: BinaryValue) -> tuple:
-        r_str = val.binstr[0: self.n_real]
-        im_str = val.binstr[-self.n_im:]
+    def decode(self, val: LogicArray) -> tuple:
+        r_str = val.binstr[0: self.n_real_bits]
+        im_str = val.binstr[-self.n_im_bits:]
 
-        r = BinaryValue(r_str).signed_integer
-        im = BinaryValue(im_str).signed_integer
+        r = LogicArray(r_str).signed_integer
+        im = LogicArray(im_str).signed_integer
 
         return (r, im)
 
