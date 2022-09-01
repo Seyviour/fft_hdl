@@ -1,3 +1,4 @@
+import math
 from random import randint
 import cocotb
 from cocotb.binary import BinaryRepresentation, BinaryValue
@@ -34,7 +35,6 @@ class ComplexNumUtil:
         this_range = Range(self.n_im_bits+self.n_real_bits-1, 0)
         return LogicArray(r.binstr + im.binstr, this_range)
 
-    
     def decode(self, val: LogicArray) -> tuple:
         r_str = val.binstr[0: self.n_real_bits]
         im_str = val.binstr[-self.n_im_bits:]
@@ -43,6 +43,21 @@ class ComplexNumUtil:
         im = LogicArray(im_str).signed_integer
 
         return (r, im)
+
+    def decode_complex(self, val: LogicArray) -> complex:
+        tup = self.decode(val)
+        return complex(*tup)
+
+    @staticmethod
+    def static_decode(val: LogicArray, n_real_bits, n_im_bits):
+        r_str = val.binstr[0: n_real_bits]
+        im_str = val.binstr[-n_im_bits:]
+
+        r = LogicArray(r_str).signed_integer
+        im = LogicArray(im_str).signed_integer
+
+        return (r, im)
+
 
 
 
@@ -144,6 +159,7 @@ class ModuleTester:
         self.inputs = input_list
         self.outputs = output_list
         self._checker = None
+        self.driver = None 
 
         try:
             self.input_dict = {name: getattr(self.dut, name) for name in self.inputs}
@@ -154,6 +170,7 @@ class ModuleTester:
         self.test = None
         self.previous_outputs = None
         self.previous_inputs = None
+        self.clock = None
 
 
     async def _check(self):
@@ -183,7 +200,104 @@ class ModuleTester:
         self.input_monitor.stop()
         self.output_monitor.stop()
         self._checker.kill()
-        self._checker = None 
+        self._checker = None
+
+    async def reset_dut(self):
+        await FallingEdge(self.dut.clk)
+        self.dut.reset.value = 1
+        await FallingEdge(self.dut.clk)
+        self.dut.reset.value = 0
+
+    def start_clock(self):
+        cocotb.start_soon(self.clock.start())
+
+    def make_data_valid_monitor(self, signal_dict, valid_signal):
+        monitor = DataValidMonitor(self.dut.clk, signal_dict, signal_dict[valid_signal])
+        return monitor
+
+    def make_input_valid_monitor(self, valid_signal):
+        monitor = self.make_data_valid_monitor(self.input_dict, valid_signal)
+        self.input_monitor = monitor
+    
+    def make_output_valid_monitor(self, valid_signal):
+        monitor = self.make_data_valid_monitor(self.output_dict, valid_signal)
+        self.output_monitor = monitor
+
+
+    async def start_clock_and_reset(self):
+        self.start_clock()
+        await self.reset_dut()
+
+    def start_driver(self):
+        cocotb.start_soon(self.driver(self))
+
+    
+
+
+
+
+
+class Models:
+    @staticmethod
+    def cMultModel(A, B):
+        A = ComplexNumUtil.static_decode(A, 16, 16)
+        B = ComplexNumUtil.static_decode(B, 16, 16)
+        
+        A = complex(*A)
+        B = complex(*B)
+
+        C = A * B
+
+        c_im = int(C.imag)>>16
+        c_re = int(C.real)>>16
+
+        return complex(c_re, c_im)
+    
+    @staticmethod
+    def BPUModel(twiddle, sample1, sample2):
+        temp = Models.cMultModel(twiddle, sample2)
+        samp1 = ComplexNumUtil.static_decode(sample1, 16, 16)
+        samp1 = complex(*samp1)
+
+        comp1 = samp1 + temp
+        comp2 = samp1 - temp
+
+        return (comp1, comp2)
+
+
+    @staticmethod
+    def model_AGU(stage, pair_id, N=32):
+        
+        
+        stage = LogicArray(stage)
+        i = stage.integer
+
+        pair_id = LogicArray(pair_id)
+        j = pair_id.integer
+        ja = j << 1
+        jb = ja + 1
+        ja = ((ja << i) | (ja >> (5 - i))) & 0x1f
+        jb = ((jb << i) | (ja >> (5 - i))) & 0x1f
+
+
+        TwAddr = ( ( 0xfffffff0 >> i ) & 0xf ) & j
+
+        #straight from the horses mouth, lol
+
+        return (ja, jb, TwAddr)
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
