@@ -49,8 +49,8 @@ input_list = ["clk", "reset", "bank_select", "wr_en",
 
 output_list = ["o_valid", "wr_complete", "samp1", "samp2"] #, "cRAM0", "cRAM1"
 
-@cocotb.test()
-async def check(dut):
+@cocotb.test(stage=0, skip=False)
+async def check_write_success_to_bank(dut):
     
     def test(input, output):
 
@@ -96,15 +96,85 @@ async def check(dut):
                     tester.dut.wr_en.value = 0
                     continue
 
-                data1, data2 = random.randint(0, 2**15), random.randint(0, 2**15)
+                data1, data2 = random.randint(0, 2**16-1), random.randint(0, 2**15)
 
                 tester.dut.wr_address1.value = address1
                 tester.dut.wr_address2.value = address2
+
+                tester.dut.rd_address1.value = address1
+                tester.dut.rd_address2.value = address2
+
+                
                 tester.dut.wr_en.value = 1
+                # tester.dut.read_en.value = 0
                 tester.dut.comp1.value = data1
                 tester.dut.comp2.value = data2
                 tester.dut.bank_select.value = bank
                 tester.dut.reset.value = 0
+                tester.dut.read_en = 0
+
+    
+@cocotb.test(stage=1)
+async def check_alternate_bank_remains_unchanged(dut):
+
+    def to_python_array(cocotb_array):
+        cocotb_array = copy(list(cocotb_array))
+        cocotb_array.reverse()
+        py_array = [str(a.value) for a in cocotb_array]
+        return py_array
+
+    bank0_memory = to_python_array(dut.cRAM0.memory1)
+    bank1_memory = to_python_array(dut.cRAM1.memory1)
+
+    
+
+    def compare_previous():
+        nonlocal bank0_memory, bank1_memory
+        if dut.bank_select.value == 0:
+            current =  to_python_array(dut.cRAM1.memory1)
+            assert bank1_memory == current
+            bank0_memory = to_python_array(dut.cRAM0.memory1)
+        elif dut.bank_select.value == 1:
+            current = to_python_array(dut.cRAM0.memory1)
+            assert bank0_memory == current
+            bank1_memory = to_python_array(dut.cRAM1.memory1)
+
+        assert not(dut.b0_wr_en.value == dut.b1_wr_en.value == 1)
+        assert not(dut.b0_read_en.value == dut.b1_read_en.value == 1)
+
+    def set_next():
+        dut.bank_select.value = random.randint(0,1)
+        dut.wr_en.value = random.randint(0,1)
+        dut.read_en.value = random.randint(0,1)
+        dut.wr_address1.value = random.randint(0,32-1)
+        dut.wr_address2.value = random.randint(0,32-1)
+        dut.rd_address1.value = random.randint(0,32-1)
+        dut.rd_address2.value = random.randint(0,32-1)
+        dut.comp1.value = random.randint(0, 2**32-1)
+        dut.comp2.value = random.randint(0, 2**32-1)
+
+
+
+    cocotb.start_soon(Clock(dut.clk, 10, units = "ns").start())
+    await FallingEdge(dut.clk)
+    dut.reset.value = 1
+    await FallingEdge (dut.clk)
+    dut.reset.value = 0
+    dut.bank_select.value = 0
+
+    bank0_memory = to_python_array(dut.cRAM0.memory1)
+    bank1_memory = to_python_array(dut.cRAM1.memory1)
+
+    for i in range(3000):
+        await FallingEdge(dut.clk)
+        compare_previous()
+        # dut._log.info("done")
+        set_next()
+
+
+
+
+    
 
 
 
