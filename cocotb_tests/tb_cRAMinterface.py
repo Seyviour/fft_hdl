@@ -42,7 +42,7 @@ module interfaceRAM #(
 
 """
 
-input_list = ["clk", "reset", "bank_select", "wr_en",
+input_list = ["clk", "reset", "bank_select", "wr_en", "read_en",
         "wr_address1", "wr_address2",
         "rd_address1", "rd_address2",
         "comp1", "comp2"]
@@ -113,8 +113,10 @@ async def check_write_success_to_bank(dut):
                 tester.dut.reset.value = 0
                 tester.dut.read_en = 0
 
+    tester.reset_dut()
+    await RisingEdge(dut.clk)
     
-@cocotb.test(stage=1)
+@cocotb.test(stage=1, skip=False)
 async def check_alternate_bank_remains_unchanged(dut):
 
     def to_python_array(cocotb_array):
@@ -170,13 +172,79 @@ async def check_alternate_bank_remains_unchanged(dut):
         compare_previous()
         # dut._log.info("done")
         set_next()
-
-
-
-
     
+    
+    await RisingEdge(dut.clk)
 
 
+@cocotb.test(stage=2)
+async def test_reads(dut):
+    
+    memory1_vals = [random.randint(0, 2**32-1) for _ in range(32)]
+    memory2_vals = [random.randint(0, 2**32-1) for _ in range(32)]
+
+    memory_comb = [memory1_vals, memory2_vals]
 
 
+    def test(input, output):
 
+        if input["bank_select"].value == 0: 
+            memory = dut.cRAM1
+        elif input["bank_select"].value == 1:
+            memory = dut.cRAM0
+
+        memory = memory.memory1
+        memory = list(memory)
+        # print(memory)
+        memory = copy(memory)
+        memory.reverse()
+        memory = [a.value for a in memory]
+
+        address1 = input["rd_address1"]
+        address2 = input["rd_address2"]
+
+        data1 = output["samp1"]
+        data2 = output["samp2"]
+
+        # print(memory)
+        assert memory[address1] == data1
+        assert memory[address2] == data2
+
+    tester2 = coco_helpers.ModuleTester(dut, input_list, output_list)
+    tester2.test = test
+    tester2.make_input_valid_monitor("read_en")
+    tester2.make_output_valid_monitor("o_valid")
+    tester2.clock = Clock(dut.clk, 10, units="ns")
+    tester2.start_clock()
+    await tester2.reset_dut()
+    tester2.start()
+
+
+    for bank in (0,1):
+        for addr in range(16):
+
+            await FallingEdge(tester2.dut.clk)
+
+            addr1 = addr * 2
+            addr2 = addr * 2 + 1
+            tester2.dut.wr_address1.value = addr1
+            tester2.dut.wr_address2.value = addr2
+            tester2.dut.wr_en.value = 1
+            tester2.dut.comp1.value = memory_comb[bank][addr1]
+            tester2.dut.comp2.value = memory_comb[bank][addr2]
+            tester2.dut.bank_select.value = bank
+            tester2.dut.reset.value = 0
+            tester2.dut.read_en = 0
+
+
+    for _ in range(1200):
+        await RisingEdge(tester2.dut.clk)
+        tester2.dut.bank_select.value = random.randint(0,1)
+        tester2.dut.wr_en.value = 0
+        tester2.dut.read_en.value = random.randint(0,1)
+        tester2.dut.wr_address1.value = random.randint(0,32-1)
+        tester2.dut.wr_address2.value = random.randint(0,32-1)
+        tester2.dut.rd_address1.value = random.randint(0,32-1)
+        tester2.dut.rd_address2.value = random.randint(0,32-1)
+        tester2.dut.comp1.value = random.randint(0, 2**32-1)
+        tester2.dut.comp2.value = random.randint(0, 2**32-1)
