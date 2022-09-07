@@ -14,6 +14,7 @@ module RAM_arbiter #(
 
     
     input wire io_wr_en, fft_wr_en, 
+    input wire io_read_en, fft_read_en,
 
 
     input wire [address_width-1: 0] io_wr_address1, io_wr_address2,
@@ -35,7 +36,9 @@ module RAM_arbiter #(
     output reg [address_width-1: 0] cram_rd_address1, cram_rd_address2,
     output reg [address_width-1: 0] cram_wr_address1, cram_wr_address2,
 
-    output reg cram_wr_en
+
+
+    output reg cram_wr_en, cram_read_en
 );
 
 // as long as all input signals are registered (on the outputs of their respective modules),
@@ -47,7 +50,6 @@ module RAM_arbiter #(
 always @(*) begin
     {io_rd_sample1, io_rd_sample2} = {cram_rd_data1, cram_rd_data2};
     {fft_rd_sample1, fft_rd_sample2} = {cram_rd_data1, cram_rd_data2};
-
 end
 
 always @(*) begin
@@ -58,6 +60,7 @@ always @(*) begin
         cram_wr_address1 = fft_wr_address1;
         cram_wr_address2 = fft_wr_address2;
         cram_wr_en = fft_wr_en;
+        cram_read_en = fft_read_en; 
         {cram_wr_data1, cram_wr_data2} = {fft_wr_sample1, fft_wr_sample2};
 
         
@@ -67,6 +70,7 @@ always @(*) begin
         cram_wr_address1 = io_wr_address1;
         cram_wr_address2 = io_wr_address2;
         cram_wr_en = io_wr_en;
+        cram_read_en = io_read_en; 
         {cram_wr_data1, cram_wr_data2} = {io_wr_sample1, io_wr_sample2};
     end
     

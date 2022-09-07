@@ -1,0 +1,515 @@
+$date
+	Sat Sep  3 01:06:12 2022
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	1s
+$end
+$scope module interfaceRAM $end
+$scope module cRAM0 $end
+$var wire 5 ! address1 [4:0] $end
+$var wire 5 " address2 [4:0] $end
+$var wire 1 # clk $end
+$var wire 32 $ in1 [31:0] $end
+$var wire 32 % in2 [31:0] $end
+$var wire 1 & read_en $end
+$var wire 1 ' sel $end
+$var wire 1 ( wr_en $end
+$var reg 1 ) o_valid $end
+$var reg 32 * out1 [31:0] $end
+$var reg 32 + out2 [31:0] $end
+$var reg 1 , wr_complete $end
+$var integer 32 - idx [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM0 $end
+$var reg 32 . \memory1[0] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM0 $end
+$var reg 32 / \memory1[1] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM0 $end
+$var reg 32 0 \memory1[2] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM0 $end
+$var reg 32 1 \memory1[3] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM0 $end
+$var reg 32 2 \memory1[4] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM0 $end
+$var reg 32 3 \memory1[5] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM0 $end
+$var reg 32 4 \memory1[6] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM0 $end
+$var reg 32 5 \memory1[7] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM0 $end
+$var reg 32 6 \memory1[8] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM0 $end
+$var reg 32 7 \memory1[9] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM0 $end
+$var reg 32 8 \memory1[10] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM0 $end
+$var reg 32 9 \memory1[11] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM0 $end
+$var reg 32 : \memory1[12] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM0 $end
+$var reg 32 ; \memory1[13] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM0 $end
+$var reg 32 < \memory1[14] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM0 $end
+$var reg 32 = \memory1[15] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM0 $end
+$var reg 32 > \memory1[16] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM0 $end
+$var reg 32 ? \memory1[17] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM0 $end
+$var reg 32 @ \memory1[18] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM0 $end
+$var reg 32 A \memory1[19] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM0 $end
+$var reg 32 B \memory1[20] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM0 $end
+$var reg 32 C \memory1[21] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM0 $end
+$var reg 32 D \memory1[22] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM0 $end
+$var reg 32 E \memory1[23] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM0 $end
+$var reg 32 F \memory1[24] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM0 $end
+$var reg 32 G \memory1[25] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM0 $end
+$var reg 32 H \memory1[26] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM0 $end
+$var reg 32 I \memory1[27] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM0 $end
+$var reg 32 J \memory1[28] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM0 $end
+$var reg 32 K \memory1[29] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM0 $end
+$var reg 32 L \memory1[30] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM0 $end
+$var reg 32 M \memory1[31] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM1 $end
+$var wire 5 N address1 [4:0] $end
+$var wire 5 O address2 [4:0] $end
+$var wire 1 # clk $end
+$var wire 32 P in1 [31:0] $end
+$var wire 32 Q in2 [31:0] $end
+$var wire 1 R read_en $end
+$var wire 1 S sel $end
+$var wire 1 T wr_en $end
+$var reg 1 U o_valid $end
+$var reg 32 V out1 [31:0] $end
+$var reg 32 W out2 [31:0] $end
+$var reg 1 X wr_complete $end
+$var integer 32 Y idx [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM1 $end
+$var reg 32 Z \memory1[0] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM1 $end
+$var reg 32 [ \memory1[1] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM1 $end
+$var reg 32 \ \memory1[2] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM1 $end
+$var reg 32 ] \memory1[3] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM1 $end
+$var reg 32 ^ \memory1[4] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM1 $end
+$var reg 32 _ \memory1[5] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM1 $end
+$var reg 32 ` \memory1[6] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM1 $end
+$var reg 32 a \memory1[7] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM1 $end
+$var reg 32 b \memory1[8] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM1 $end
+$var reg 32 c \memory1[9] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM1 $end
+$var reg 32 d \memory1[10] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM1 $end
+$var reg 32 e \memory1[11] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM1 $end
+$var reg 32 f \memory1[12] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM1 $end
+$var reg 32 g \memory1[13] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM1 $end
+$var reg 32 h \memory1[14] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM1 $end
+$var reg 32 i \memory1[15] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM1 $end
+$var reg 32 j \memory1[16] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM1 $end
+$var reg 32 k \memory1[17] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM1 $end
+$var reg 32 l \memory1[18] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM1 $end
+$var reg 32 m \memory1[19] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM1 $end
+$var reg 32 n \memory1[20] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM1 $end
+$var reg 32 o \memory1[21] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM1 $end
+$var reg 32 p \memory1[22] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM1 $end
+$var reg 32 q \memory1[23] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM1 $end
+$var reg 32 r \memory1[24] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM1 $end
+$var reg 32 s \memory1[25] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM1 $end
+$var reg 32 t \memory1[26] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM1 $end
+$var reg 32 u \memory1[27] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM1 $end
+$var reg 32 v \memory1[28] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM1 $end
+$var reg 32 w \memory1[29] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM1 $end
+$var reg 32 x \memory1[30] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$scope module cRAM1 $end
+$var reg 32 y \memory1[31] [31:0] $end
+$upscope $end
+$upscope $end
+$scope module interfaceRAM $end
+$var wire 1 z bank_select $end
+$var wire 1 # clk $end
+$var wire 32 { comp1 [31:0] $end
+$var wire 32 | comp2 [31:0] $end
+$var wire 1 } o_b0_valid $end
+$var wire 1 ~ o_b1_valid $end
+$var wire 5 !" rd_address1 [4:0] $end
+$var wire 5 "" rd_address2 [4:0] $end
+$var wire 1 #" reset $end
+$var wire 5 $" wr_address1 [4:0] $end
+$var wire 5 %" wr_address2 [4:0] $end
+$var wire 1 &" wr_en $end
+$var wire 1 X wr_complete_bank1 $end
+$var wire 1 , wr_complete_bank0 $end
+$var wire 32 '" b1_sample2 [31:0] $end
+$var wire 32 (" b1_sample1 [31:0] $end
+$var wire 32 )" b0_sample2 [31:0] $end
+$var wire 32 *" b0_sample1 [31:0] $end
+$var reg 5 +" b0_address1 [4:0] $end
+$var reg 5 ," b0_address2 [4:0] $end
+$var reg 1 & b0_read_en $end
+$var reg 1 ( b0_wr_en $end
+$var reg 5 -" b1_address1 [4:0] $end
+$var reg 5 ." b1_address2 [4:0] $end
+$var reg 1 R b1_read_en $end
+$var reg 1 T b1_wr_en $end
+$var reg 1 /" o_valid $end
+$var reg 32 0" samp1 [31:0] $end
+$var reg 32 1" samp2 [31:0] $end
+$var reg 1 2" wr_complete $end
+$scope module cRAM0 $end
+$upscope $end
+$scope module cRAM1 $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+#0
+$dumpvars
+x2"
+bx 1"
+bx 0"
+z/"
+bz ."
+bz -"
+bz ,"
+bz +"
+bx *"
+bx )"
+bx ("
+bx '"
+z&"
+bz %"
+bz $"
+z#"
+bz ""
+bz !"
+x~
+z}
+bz |
+bz {
+zz
+bx y
+bx x
+bx w
+bx v
+bx u
+bx t
+bx s
+bx r
+bx q
+bx p
+bx o
+bx n
+bx m
+bx l
+bx k
+bx j
+bx i
+bx h
+bx g
+bx f
+bx e
+bx d
+bx c
+bx b
+bx a
+bx `
+bx _
+bx ^
+bx ]
+bx \
+bx [
+bx Z
+b100000 Y
+xX
+bx W
+bx V
+xU
+zT
+1S
+xR
+bz Q
+bz P
+bz O
+bz N
+bx M
+bx L
+bx K
+bx J
+bx I
+bx H
+bx G
+bx F
+bx E
+bx D
+bx C
+bx B
+bx A
+bx @
+bx ?
+bx >
+bx =
+bx <
+bx ;
+bx :
+bx 9
+bx 8
+bx 7
+bx 6
+bx 5
+bx 4
+bx 3
+bx 2
+bx 1
+bx 0
+bx /
+bx .
+b100000 -
+x,
+bx +
+bx *
+x)
+0(
+1'
+1&
+bz %
+bz $
+z#
+bz "
+bz !
+$end

@@ -1,0 +1,21 @@
+MODULE                  TESTBENCH
+
+FFT3.v
+ComputeDriver.v
+
+AGU.v                       x
+
+BPU.v                       x
+buffer.v                    x
+cMult.v                     x
+
+RAM_top.v
+RAM_arbiter.v
+cRAMinterface.v             x
+cRAM.v                      x
+
+IOmodule.v
+FFT_input.v
+FFT_output.v
+
+twiddleROM.v

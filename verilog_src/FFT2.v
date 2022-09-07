@@ -1,3 +1,6 @@
+// `include "cRAMinterface.v"
+
+
 module FFT #(
     parameter word_size = 16,
     N = 32
@@ -136,8 +139,9 @@ always @(*) begin
         rd_address2 = s2_addr; 
     end
 
-    out_samp1 = ram_samp1;
-    out_samp2 = ram_samp2;
+    i_out_samp1 = ram_samp1;
+    i_out_samp2 = ram_samp2;
+
     i_BPU_A = ram_samp1;
     i_BPU_B = ram_samp2;
 
@@ -171,7 +175,12 @@ fftOutput #(.N(N), .word_size(word_size), .address_width(address_width)) fftOut
 
 always @(*) begin
     out_comp1 = out_samp1;
-    out_compo2 = out_samp2; 
+    out_comp2 = out_samp2; 
 end
 
 endmodule
+
+
+// When input or output is taking place, no internal computations are valid
+// while internal computations are taking place, disallow I/O
+

@@ -1,3 +1,6 @@
+`include "/home/saviour/study/fft_hdl/verilog_src/FFT_input.v"
+`include "/home/saviour/study/fft_hdl/verilog_src/FFT_output.v"
+
 module IOmodule #(
     parameter N = 32,
     word_size = 16,
@@ -5,30 +8,30 @@ module IOmodule #(
 ) (
     input wire clk, reset, en,
     
-    input wire fft_busy, // FROM FFT MODULE 
+    input wire fft_busy, fft_valid, // FROM FFT MODULE 
     input wire input_valid, receiver_ready,  //FROM OUTSIDE WORLD
      
     input wire [word_size*2-1: 0] i_input_sample1, i_input_sample2, //FROM OUTSIDE WORLD
-    output reg [word_size*2-1: 0] o_input_comp1, o_input_comp2, // TO FFT BLOCK
+    output wire [word_size*2-1: 0] o_input_comp1, o_input_comp2, // TO FFT BLOCK
 
-    output reg [address_width-1: 0] o_input_wr_addr1, o_input_wr_addr2, // TO FFT BLOCK
+    output wire [address_width-1: 0] o_input_wr_addr1, o_input_wr_addr2, // TO FFT BLOCK
 
     input wire [word_size*2-1: 0] i_output_sample1, i_output_sample2, // FROM FFT BLOCK
-    output reg [word_size*2-1: 0] o_output_sample1, o_output_sample2, // TO OUTSIDE WORLD
+    output wire [word_size*2-1: 0] o_output_sample1, o_output_sample2, // TO OUTSIDE WORLD
      
-    output reg [address_width-1: 0] o_output_rd_addr1, o_output_rd_addr2, // TO FFT BLOCK
+    output wire [address_width-1: 0] o_output_rd_addr1, o_output_rd_addr2, // TO FFT BLOCK
 
-    output wire rd_en, wr_en,
+    output reg rd_en, wr_en,
 
-    output wire output_valid, 
+    output wire o_output_valid, o_input_valid,
 
     output reg io_busy
 );
 
-reg o_output_valid; 
-reg o_input_wr_en;
-reg o_output_rd_en; 
-reg o_input_busy, o_output_busy; 
+// wire o_output_valid; 
+wire o_input_wr_en;
+wire o_output_rd_en; 
+wire o_input_busy, o_output_busy; 
 reg input_enable, output_enable;
 reg input_reset, output_reset; 
 
@@ -42,7 +45,6 @@ always @(*) begin
     output_enable = en & fft_valid & ~fft_busy & receiver_ready;
     input_reset = fft_busy | reset;
     output_reset = fft_busy | reset;
-    output_valid = o_output_valid; 
 end
 
 fftInput #(.N(N), .word_size(word_size), .address_width(address_width)) fft_input
@@ -57,7 +59,8 @@ fftInput #(.N(N), .word_size(word_size), .address_width(address_width)) fft_inpu
     .addr1(o_input_wr_addr1),
     .addr2(o_input_wr_addr2),
     .wr_en(o_input_wr_en),
-    .busy(o_input_busy));
+    .busy(o_input_busy),
+    .o_input_valid(o_input_valid));
 
 
 fftOutput #(.N(N), .word_size(word_size), .address_width(address_width)) fft_output
@@ -72,7 +75,7 @@ fftOutput #(.N(N), .word_size(word_size), .address_width(address_width)) fft_out
     .out_samp2(o_output_sample2),
     .out_valid(o_output_valid),
     .rd_en(o_output_rd_en),
-    .done(o_output_busy)
+    .busy(o_output_busy)
     );
 
 endmodule

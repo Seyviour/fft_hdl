@@ -8,37 +8,46 @@ module fftInput #(
     input wire [word_size*2-1: 0] sample1, sample2, 
     output reg [word_size*2-1: 0] comp1, comp2,
     output reg [address_width-1: 0] addr1, addr2,
-    output reg wr_en, busy
+    output reg wr_en, busy, o_input_valid
 );
     
-initial begin
-    $dumpfile("fftInput.vcd");
-    $dumpvars(0, fftInput);
-end
+// initial begin
+//     $dumpfile("fftInput.vcd");
+//     $dumpvars(0, fftInput);
+// end
+
+///FOR TESTING CONVENIENCE
+wire start;
+assign start = en && in_valid;
 
 
 always @(posedge clk, posedge reset) begin
 
+    comp1 <= {Cr, Ci}; 
+    comp2 <= {Dr, Di}; 
+                
     if (reset) begin
-        comp1 <= 0;
-        comp2 <= 0;
         addr1 <= 0;
         // addr2 <= 1;
         wr_en <= 0; 
-        busy <= 0; 
+        busy <= 0;
+        o_input_valid <= 0; 
     end
 
-    else if (en) begin
-        if (addr2 == N-1) begin
-            busy <= 0;
-            wr_en <= 0;
-        end else begin
-            busy  <= 1'b1;  
-            comp1 <= {Cr, Ci}; 
-            comp2 <= {Dr, Di}; 
-            addr1 <= addr1 + 2;
-            // addr2 <= addr2 + 2;
-            wr_en <= in_valid & en;
+    else  begin
+        if (start) begin
+            o_input_valid <= 1'b0; 
+            busy <= 1'b1;
+            wr_en <= 1'b1; 
+            if (addr2 == N-1) begin
+                busy <= 1'b0;
+                wr_en <= 1'b0;
+                o_input_valid <= 1'b1; 
+            end else begin 
+                if (busy)
+                    addr1 <= addr1 + 2;
+                
+            end
         end
     end        
 end 

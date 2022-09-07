@@ -11,7 +11,7 @@ module fftOutput #(
 );      
     
 
-always @(posedge clk, posedge reset) begin
+always @(posedge clk) begin
     out_samp1 <= in_samp1;
     out_samp2 <= in_samp2;
 
@@ -23,19 +23,21 @@ always @(posedge clk, posedge reset) begin
         busy <= 0; 
     end
 
-    else if (en) begin
-        if (out_addr2 == N-1) begin
-            // out_addr1 <= 0; 
-            busy <= 0;
-            out_valid <= 0; 
-            rd_en <= 0; 
-        end else begin
-            busy <= 1; 
-            out_valid <= 1; 
-            rd_en <= 1;
-            out_addr1 <= out_addr1 + 2;
-            // out_addr2 <= out_addr1 + 2;
-        end 
+    else  begin
+        if (en) begin
+            if (out_addr2 == N-1) begin
+                // out_addr1 <= 0; 
+                busy <= 0;
+                out_valid <= 0; 
+                rd_en <= 0; 
+            end else begin
+                busy <= 1; 
+                out_valid <= 1; 
+                rd_en <= 1;
+                out_addr1 <= out_addr1 + 2'b10;
+                // out_addr2 <= out_addr1 + 2;
+            end
+    end 
     end
 end
 

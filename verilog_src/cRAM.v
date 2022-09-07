@@ -17,14 +17,16 @@ module cRAM #(
     output reg o_valid, wr_complete
 );
     
-    integer idx;
-    initial begin
-        $dumpfile("cRAM.vcd");
-        $dumpvars(0, cRAM);
-        for (idx = 0; idx < N; idx = idx + 1) begin
-            $dumpvars(0, memory1[idx]);
-        end
-    end
+    // integer idx;
+    // initial begin
+    //     $dumpfile("cRAM.vcd");
+    //     $dumpvars(0, cRAM);
+    //     for (idx = 0; idx < N; idx = idx + 1) begin
+    //         $dumpvars(0, memory1[idx]);
+    //     end
+    // end
+
+
     // RAM DECLARATION -> complex and real concatenated into a single
     //  2*vector_size integer
     
@@ -40,14 +42,17 @@ module cRAM #(
         end
 
 
-        else if (read_en & sel)begin
-            out1 <= memory1[address1];
-            out2 <= memory1[address2];
-        end
+        // else if (read_en & sel)begin
+             out1 <= memory1[address1];
+             out2 <= memory1[address2];
+        // end
 
         wr_complete <= wr_en;
         o_valid <= read_en; 
     end
+
+    // assign out1 = memory1[address1];
+    // assign out2 = memory1[address2];
 
 
 endmodule

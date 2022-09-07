@@ -4,15 +4,19 @@ module AGU #(
     pair_id_width = $clog2(N/2),
     address_width = $clog2(N)
 ) (
-    input wire i_valid, 
     input wire clk, reset,
+    input wire i_valid, 
     input wire [stage_width-1: 0] stage,
-    input wire [pair_id_width - 1: 0] pair_id, 
-    output reg [address_width -1 : 0] address1, address2, 
-    output reg [address_width -1: 0] twiddle_address,
+    input wire [pair_id_width-1: 0] pair_id, 
+    output reg [address_width-1 : 0] address1, address2, 
+    output reg [address_width-1: 0] twiddle_address,
     output reg o_valid
 );
 
+// initial begin
+//     $dumpfile("AGU.vcd");
+//     $dumpvars(0,AGU);
+// end
 
 // N is the number of samples in the fourier transform
 // log2N is the number of bits neccessary to represent N different states

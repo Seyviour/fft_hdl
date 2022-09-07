@@ -32,10 +32,10 @@ module interfaceRAM #(
     reg b0_read_en, b1_read_en; 
     wire wr_complete_bank0, wr_complete_bank1;
 
-    initial begin
-        $dumpfile("cRAMinterface.vcd");
-        $dumpvars(0, interfaceRAM); 
-    end
+    // initial begin
+    //     $dumpfile("cRAMinterface.vcd");
+    //     $dumpvars(0, interfaceRAM); 
+    // end
 
     //// STORE BANK_SELECT FOR OUTPUT ROUTING ///
     always @(posedge clk ) begin

@@ -1,23 +1,22 @@
-`include "cMult.v"
-`include "buffer.v"
+`include "/home/saviour/study/fft_hdl/verilog_src/cMult.v"
+`include "/home/saviour/study/fft_hdl/verilog_src/buffer.v"
 
 module BPU #(
     parameter N = 32, 
     word_size = 16,
     mult_latency = 2,
-    address_size = $clog2(N)
+    address_width = $clog2(N)
 ) (
     input wire clk, reset, 
     input wire i_valid,
-
-    input wire [address_size-1: 0] address1, address2, 
-    input wire [word_size-1: 0] twiddle,  //Twiddle factor
-    input wire [word_size*2-1: 0] sample1,  // A
-    input wire [word_size*2-1: 0] sample2,  // B -> term to be multiplied by twiddle
-    output wire [word_size*2-1: 0] comp1, // A + (B * Twiddle_factor)
-    output wire [word_size*2-1: 0] comp2,  // A - (B * Twiddle_factor)
+    input wire [address_width-1: 0] address1, address2, 
+    input wire signed [word_size*2-1: 0] twiddle,  //Twiddle factor
+    input wire signed [word_size*2-1: 0] sample1,  // A
+    input wire signed [word_size*2-1: 0] sample2,  // B -> term to be multiplied by twiddle
+    output wire signed [word_size*2-1: 0] comp1, // A + (B * Twiddle_factor)
+    output wire signed [word_size*2-1: 0] comp2,  // A - (B * Twiddle_factor)
     output reg d_valid,
-    output reg [address_size-1: 0] wr_address1, wr_address2
+    output reg [address_width-1: 0] wr_address1, wr_address2
 );
 
 
@@ -33,19 +32,33 @@ module BPU #(
 
 // input wire clk,
 
+// initial begin
+//     $dumpfile("BPU.vcd");
+//     $dumpvars(0, BPU);
+//     // $dumpvars(1, unit1);
+// end
+// initial begin
+//     $dumpfile("BPU_cMult.vcd");
+//     $dumpvars(1, unit1);
+// end
+
 
 localparam memory_buffer_length = mult_latency + 1;
 
-wire [word_size*2-1: 0] temp;
-wire [word_size*2-1: 0] o_buffer_sample1;
+wire signed [word_size*2-1: 0] temp;
+wire signed [word_size*2-1: 0] o_buffer_sample1;
 wire o_buffer_d_valid;
 
 // CMULT: (Ci, Cr) = (Ar, Ai) * (Br, Bi)
 cMult unit1
-    (.clk(clk), 
+    (.clk(clk),
+    .i_valid(i_valid),
+    .reset(reset),
     .A(twiddle), 
     .B(sample2),
     .C(temp));
+
+
 
 buffer #(.word_size(word_size*2), .buffer_length(mult_latency)) bpu_buffer
     (.clk(clk), .reset(reset), .en(1'b1), 
@@ -55,8 +68,8 @@ buffer #(.word_size(word_size*2), .buffer_length(mult_latency)) bpu_buffer
     .d_out(o_buffer_sample1));
 
 
-wire [address_size*2-1: 0] o_address_buffer;
-buffer #(.word_size(address_size*2), .buffer_length(mult_latency)) address_buffer
+wire [address_width*2-1: 0] o_address_buffer;
+buffer #(.word_size(address_width*2), .buffer_length(mult_latency+1)) address_buffer
     (.clk(clk), .reset(reset), .en(1'b1),
     .in_valid(i_valid),
     .d_in({address1, address2}),
@@ -73,8 +86,8 @@ always @(posedge clk, posedge reset ) begin
         Dr <= 0;
         Di <= 0; 
     end else begin
-        wr_address1 <= o_address_buffer[address_size*2-1: address_size];
-        wr_address2 <= o_address_buffer[address_size-1: 0];
+        wr_address1 <= o_address_buffer[address_width*2-1: address_width];
+        wr_address2 <= o_address_buffer[address_width-1: 0];
         
         d_valid <= o_buffer_d_valid;
 
@@ -88,5 +101,9 @@ end
 
 assign comp1 = {Cr, Ci};
 assign comp2 = {Dr, Di};
+
+
+
+
     
 endmodule
