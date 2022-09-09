@@ -29,7 +29,8 @@ parser.add_argument("Q",
 
 parser.add_argument("--separate",
                     help = "write different files for real and complex values",
-                    action = "store_true")
+                    action = "store_true",
+                    default=True)
 
 parser.add_argument("-f,",
                     "--format",
@@ -48,11 +49,11 @@ elif args.format == 'b':
     num_chars = args.Q 
 
 str_mag_format = "{:0" + str(num_chars) +  args.format + "}"
-multiplier = 2 ** (args.Q-1) -1
+multiplier = 2 ** (args.Q-1)-1 
 
 
 def get_nth_roots_of_unity(N):
-    base = math.pi/N 
+    base = -2*math.pi/N 
     for n in range(N):
         yield (math.cos(base *n ), math.sin(base * n))
 
@@ -67,12 +68,22 @@ def to_Q_fixed_point(val):
     val = int(val) & (2**args.Q)-1
     return  str_mag_format.format((val))
 
-with open(args.filename, "w") as f:
 
-    for real_comp, complex_comp in get_nth_roots_of_unity(args.num_points):
-        real_comp = to_Q_fixed_point(real_comp)
-        complex_comp = to_Q_fixed_point(complex_comp)
+if not args.separate: 
+    with open(args.filename, "w") as f:
 
-        f.write(real_comp + " " + complex_comp + "\n")
+        for real_comp, complex_comp in get_nth_roots_of_unity(args.num_points):
+            real_comp = to_Q_fixed_point(real_comp)
+            complex_comp = to_Q_fixed_point(complex_comp)
 
+            f.write(real_comp + " " + complex_comp + "\n")
 
+else: 
+    with open(args.filename + ".real", "w") as real_file, open(args.filename + ".im", "w") as im_file:
+
+        for real_comp, complex_comp in get_nth_roots_of_unity(args.num_points):
+            real_comp = to_Q_fixed_point(real_comp)
+            complex_comp = to_Q_fixed_point(complex_comp)
+
+            im_file.write(complex_comp + "\n")
+            real_file.write(real_comp + "\n")
