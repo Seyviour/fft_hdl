@@ -126,13 +126,16 @@ twiddleROM #(.N(N), .word_size(word_size)) thisTwiddleROM
     (.clk(clk), .read_address(twiddle_address),
     .twiddle(twiddle));
 
-localparam mult_latency = 2;
+localparam mult_latency = 3;
 
 /// BITE ME
 
+wire i_BPU_valid;
+assign i_BPU_valid = fft_busy && o_RAM_valid; 
+
 wire o_BPU_valid; 
 BPU #(.N(N), .word_size(word_size), .address_width(address_width), .mult_latency(mult_latency)) thisBPU
-    (.clk(clk), .reset(reset), .i_valid(o_RAM_valid), 
+    (.clk(clk), .reset(reset), .i_valid(i_BPU_valid), 
     .address1(o_AGU_address1), .address2(o_AGU_address2),
     .twiddle(twiddle), .sample1(fft_rd_sample1), .sample2(fft_rd_sample2),
     .comp1(fft_wr_sample1), .comp2(fft_wr_sample2),
