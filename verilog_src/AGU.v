@@ -23,6 +23,8 @@ module AGU #(
 // since the FFT has log2(N) stages, we need log2N bits to encode the stages
 // we operate on pairs of samples => we need log(N/2) == logN2 -1 bits to encode pairs
 localparam log2N = $clog2(N);
+
+localparam half_mask = log2N - 1;
  
 // signal declaration
 //reg [log2N-1: 0] stage_reg;
@@ -36,8 +38,11 @@ reg [address_width -1: 0] i_address1, i_address2;
 
 reg [pair_id_width : 0] pair_id_x_2, pair_id_x_2_1; // (pair_id*2, pair_id*2+1)
 reg [address_width-1: 0] i_twiddle_address;
-reg [address_width: 0] mask;
-reg [address_width: 0] mask_;
+
+localparam [half_mask*2-1: 0] mask_extended = {{half_mask{1'b1}}, {half_mask{1'b0}}};
+
+reg [half_mask-1: 0] mask;
+// reg [address_width: 0] mask_;
 // integer i; 
 
 always @(*)begin
@@ -47,9 +52,9 @@ always @(*)begin
     pair_id_x_2_1 = {pair_id, 1'b1};
     i_address1 = barrel_shift_left(pair_id_x_2, stage);
     i_address2 = barrel_shift_left(pair_id_x_2_1, stage);
-    mask = (1'b1 << stage);
-    mask_ = mask - 1'b1;
-    i_twiddle_address = mask_[log2N-1:0] & pair_id; 
+    mask = mask_extended[stage +: half_mask];
+    // mask_ = mask - 1'b1;
+    i_twiddle_address = mask & pair_id; 
     
     //generate 
     // for (i = 0; i<log2N-1; i = i + 1) begin
