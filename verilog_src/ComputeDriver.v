@@ -47,7 +47,8 @@ module fftDriver #(
                     bank_select <= ~bank_select; 
                     valid <= 1'b1;
                     fft_done <= 1'b0;
-                    fft_busy <= 1'b1; 
+                    fft_busy <= 1'b1;
+                    stage <= 0; 
                 end 
             end
 

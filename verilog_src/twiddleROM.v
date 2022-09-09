@@ -2,8 +2,8 @@ module twiddleROM #(
     parameter
     N = 32,
     word_size = 16,
-    memory_file_real = "/home/saviour/study/fft_hdl/helper/out.real",
-    memory_file_im = "/home/saviour/study/fft_hdl/helper/out.im"
+    memory_file_real = "/home/saviour/study/fft_hdl/data/out.real",
+    memory_file_im = "/home/saviour/study/fft_hdl/data/out.im"
 ) (
     input wire clk,
     input wire [$clog2(N)-1: 0] read_address,

@@ -1,6 +1,6 @@
 module buffer #(
     parameter word_size = 16,
-    buffer_length = 2
+    buffer_length = 3
 ) (
     input wire clk, en, in_valid, reset,   
     input wire [word_size-1: 0] d_in,

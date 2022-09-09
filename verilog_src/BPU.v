@@ -4,7 +4,7 @@
 module BPU #(
     parameter N = 32, 
     word_size = 16,
-    mult_latency = 2,
+    mult_latency = 4,
     address_width = $clog2(N)
 ) (
     input wire clk, reset, 
