@@ -87,8 +87,8 @@ always @(posedge clk) begin
         I_sum_rounded <= 0;
     end
     else begin
-        R_sum_rounded <= R_sum + 16'h4000;
-        I_sum_rounded <= I_sum + 16'h4000; 
+        R_sum_rounded <= R_sum + {{1'b0}, {1'b1}, {(word_size-2){1'b0}}}; //16'h4000
+        I_sum_rounded <= I_sum + {{1'b0}, {1'b1}, {(word_size-2){1'b0}}}; //16'h4000  
     end   
 end
 
