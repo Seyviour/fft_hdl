@@ -10,10 +10,10 @@ module cMult #(
     input wire reset,
     input wire clk,
     input wire i_valid,
-    input wire [word_size*2-1:0] A, 
-    input wire [word_size*2-1:0] B,
+    input wire signed [word_size*2-1:0] A, 
+    input wire signed [word_size*2-1:0] B,
     output wire o_valid,
-    output wire [word_size*2-1:0] C
+    output wire signed [word_size*2-1:0] C
 );
 
 wire signed [word_size-1: 0] Ar = A[word_size*2-1: word_size];
@@ -30,8 +30,8 @@ reg signed [2*word_size-1: 0] II; // product of the two complex components -> Ai
 reg signed [2*word_size-1: 0] RI; // product of Real1 with complex2 -> Ar * Br
 reg signed [2*word_size-1: 0] IR; // complex1 * real2 -> Ai * Br
 
-reg signed [2*word_size: 0] R_sum; // sum of real components -> RR + II
-reg signed [2*word_size: 0] I_sum; // sum of complex components -> RI + IR
+reg signed [2*word_size-1: 0] R_sum; // sum of real components -> RR + II
+reg signed [2*word_size-1: 0] I_sum; // sum of complex components -> RI + IR
 
 reg signed [2*word_size-1: 0] R_sum_rounded; // sum of real components -> RR + II
 reg signed [2*word_size-1: 0] I_sum_rounded; // sum of complex components -> RI + IR
@@ -87,6 +87,7 @@ always @(posedge clk) begin
         I_sum_rounded <= 0;
     end
     else begin
+        // FIXED-POINT ROUNDING
         R_sum_rounded <= R_sum + {{1'b0}, {1'b1}, {(word_size-2){1'b0}}}; //16'h4000
         I_sum_rounded <= I_sum + {{1'b0}, {1'b1}, {(word_size-2){1'b0}}}; //16'h4000  
     end   
@@ -106,9 +107,9 @@ assign C = {Cr, Ci};
 
 
 
-// initial begin
-//     $dumpfile("cMult.vcd");
-//     $dumpvars(0, cMult);
-// end
+initial begin
+    $dumpfile("cMult.vcd");
+    $dumpvars(0, cMult);
+end
     
 endmodule
