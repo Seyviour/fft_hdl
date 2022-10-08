@@ -59,6 +59,7 @@ async def test_butterfly_operation(dut):
         assert e_tw_address == a_tw_address, "twiddle_address should be {e_tw_address}, not {a_tw_address}"
 
     tester.test = test
+    tester.clock = Clock(dut.clk, 10, units="ns")
 
     dut._log.info("Initialize and Reset")
     tester.start_clock()
