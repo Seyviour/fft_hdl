@@ -23,9 +23,17 @@ class ComplexNumUtil:
     def __repr__(self):
         return f"ComplexNumGen(real_range={self.real_range}, n_im_bits={self.im_range})"
 
-    def create_random(self):
-        r = randint(*self.real_range_int)
-        im = randint(*self.im_range_int)
+    def create_random(self, width=None):
+        
+        if width is not None:
+            srange = (-(2**(width-1))+1, 2**(width-1)-1)
+        else:
+            srange = self.real_range_int
+
+        real_range = self.real_range_int if width is None else srange
+        im_range = self.im_range_int if width is None else srange
+        r = randint(*real_range)
+        im = randint(*im_range)
         return self.create_from(r, im)
 
     def create_from(self, r, im):
@@ -248,8 +256,8 @@ class Models:
 
         C = A * B
 
-        c_im = int(C.imag)>>16
-        c_re = int(C.real)>>16
+        c_im = int(C.imag)>>15
+        c_re = int(C.real)>>15
 
         return complex(c_re, c_im)
     
