@@ -40,60 +40,78 @@ def make_complex_number():
     
 
 
-
-
-class Tester():
-    def __init__(self, dut, input_list, output_list, input_valid, output_valid):
-        self.dut = dut
-
-        self.inputs = input_list
-        self.outputs = output_list
-        self.input_dict = {name: getattr(self.dut, name) for name in self.inputs}
-        self.output_dict = {name: getattr(self.dut, name) for name in self.outputs}
-
-
-        self.input_monitor = coco_helpers.DataValidMonitor(self.dut.clk, self.input_dict)
-        self.output_monitor = coco_helpers.DataValidMonitor(self.dut.clk, self.output_dict)
-        self.test = None
-        self.previous_state = None
-        self._checker = None
-
-    def start(self):
-        if self._checker is not None:
-            raise RuntimeError ("Tester already started")
-        self.input_monitor.start()
-        self.output_monitor.start()
-
-        try: 
-            self._checker = cocotb.start_soon(self._check())
-        except:
-            raise RuntimeError ("Failed to start testbench")
-
-    def stop(self):
-        if self._checker is None:
-            raise RuntimeError ("Tester never started")
-        self.input_monitor.stop()
-        self.output_monitor.stop()
-        self._checker.kill()
-        self._checker = None
-
-    async def _check(self):
-        while True:
-            await RisingEdge(self.dut.clk)
-            output = await self.output_monitor.values.get()
-            input = await self.input_monitor.values.get()
-            self.test(self.previous_state, input, output)
-            self.previous_state = output
-
-
-
 @cocotb.test()
-async def test_butterfly_multiplications(dut):
+async def test_butterfly_operation(dut):
 
+    complexUtil = coco_helpers.ComplexNumUtil(16, 16)
+
+    input_list = ["clk", "reset", "i_valid", "address1", "address2",
+                "twiddle", "sample1", "sample2"]
+    
+    output_list = ["comp1", "comp2", "d_valid", "wr_address1", "wr_address2"]
+
+    tester = coco_helpers.ModuleTester(dut, input_list, output_list)
+
+    tester.input_monitor = coco_helpers.DataValidMonitor(dut.clk,
+                                                    tester.input_dict,
+                                                    tester.input_dict["i_valid"]
+                                                    )
+
+    tester.output_monitor = coco_helpers.DataValidMonitor(
+        dut.clk,
+        tester.output_dict,
+        tester.output_dict["d_valid"]
+    )
+
+    def test(input, output):
+        twiddle = input["twiddle"]
+        sample1 = input["sample1"]
+        sample2 = input["sample2"]
+
+
+        e_comp1, e_comp2 = coco_helpers.Models.BPUModel(twiddle, sample1, sample2)
+        a_comp1 = complexUtil.decode_complex(output["comp1"])
+        a_comp2 = complexUtil.decode_complex(output["comp2"])
+
+        print(e_comp1, a_comp1)
+
+        assert a_comp1 == e_comp1, "comp1 should be {e_comp1} not {a_comp2}"
+        assert a_comp2 == e_comp2, "comp2 should be {e_comp2} not {a_comp2}"
+        assert input["address1"] == output["wr_address1"]
+        assert input["address2"] == output["wr_address2"]
+
+    tester.test = test
 
     cocotb.start_soon(Clock(dut.clk, 10, units="ns").start())
-
     dut._log.info("Initialize and Reset")
+
+    await FallingEdge(dut.clk)
+    dut.reset.value = 1
+    await FallingEdge(dut.clk)
+    dut.reset.value = 0
+    tester.start()
+
+
+    sample_range = (-2**13, 2 ** 13)
+    for _ in range(100):
+        await RisingEdge(dut.clk)
+        dut.address1.value = random.randint(0, 16)
+        dut.address2.value = random.randint(0, 16)
+
+        re_s1, im_s1 = random.randint(*sample_range), random.randint(*sample_range)
+        dut.sample1.value = complexUtil.create_from(re_s1, im_s1)
+        dut.sample2.value = complexUtil.create_random()
+        dut.twiddle.value = complexUtil.create_from(1,0)
+        dut.i_valid.value = 1
+
+
+
+
+
+
+    
+
+    
 
 
 
