@@ -116,6 +116,7 @@ async def test_delayed_writes_and_reads(dut: SimHandleBase):
         tester.dut.address1.value = a_1
         tester.dut.address2.value = a_2
         tester.dut.wr_en.value=1
+        dut.read_en.value = 0
         tester.dut.sel.value=1
         tester.dut.in1.value = data1
         tester.dut.in2.value = data2
